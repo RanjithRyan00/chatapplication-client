@@ -7,26 +7,43 @@ import MessageOthers from './Messageothers';
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Skeleton from "@mui/material/Skeleton";
+import AttachmentIcon from '@mui/icons-material/Attachment';
 import axios from "axios";
 import { myContext } from "./MainContainer";
 import io from "socket.io-client";
 
 const ENDPOINT = "http://localhost:8080";
-var socket,chat;
+var socket;
 
 function ChatArea() {
   const userData = JSON.parse(localStorage.getItem("userData"));
   const [messageContent, setMessageContent] = useState("");
   const chatParams = useParams();
-  
+
   const [chat_id, chat_user] = chatParams._id ? chatParams._id.split("&") : ['', ''];
   const [allMessages, setAllMessages] = useState([]);
   const { refresh, setRefresh } = useContext(myContext);
   const [loaded, setLoaded] = useState(false);
   const [socketConnectionStatus, setSocketConnectionStatus] = useState(false);
-  const [allMessagesCopy, setAllMessagesCopy] = useState([]);
 
-  const lightTheme = useSelector((state) => state.themeKey);  
+  const lightTheme = useSelector((state) => state.themeKey);
+  const messagesContainerRef = useRef(null); // Create a ref for the chat container
+  const fileRef = useRef();
+
+  function selectFile(){
+    fileRef.current.click();
+  }
+
+  function fileSelected(e){
+    const file=e.target.file[0];
+    if(!file) return
+    const reader=new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload= () => {
+      const data= reader.result;
+      socket.emit('upload',{data});
+    }
+  }
 
   const sendMessage = () => {
     const config = {
@@ -34,7 +51,6 @@ function ChatArea() {
         Authorization: `Bearer ${userData.data.token}`,
       },
     };
-  
     axios
       .post(
         "http://localhost:8080/message/",
@@ -60,51 +76,35 @@ function ChatArea() {
     socket.on("connect", () => {
       setSocketConnectionStatus(true);
     });
-  
+
     return () => {
       socket.disconnect();
     };
   }, [userData]);
-  //connet to  socket
-  useEffect(()=>{
-    socket=io(ENDPOINT);
-    socket.emit("setup,userData");
-    socket.on("connection",()=>{
-        setSocketConnectionStatus(!socketConnectionStatus);
-    })
-  },[])
 
-   /// for new message
-  
-useEffect(()=>{
-  socket.on("message recieved",(newMessage)=>{
-    if(!allMessagesCopy || allMessagesCopy._id !==newMessage.id){
-
-    }else{
-      setAllMessages([...allMessages],newMessage);
-    }
-  })
-})
-
-
-  //fetch chats
-  
   useEffect(() => {
     const config = {
       headers: {
         Authorization: `Bearer ${userData.data.token}`,
       },
     };
-  
+
     axios
       .get("http://localhost:8080/message/" + chat_id, config)
       .then(({ data }) => {
         setAllMessages(data);
         setLoaded(true);
         socket.emit("join chat", chat_id);
-      })
-    setAllMessagesCopy(allMessages);
-  }, [refresh, chat_id, userData.data.token,allMessages]);
+      });
+
+  }, [allMessages,chat_id]); // useEffect dependency should be chat_id instead of allMessages
+
+  useEffect(() => {
+    // Scroll to the bottom of the chat container whenever allMessages updates
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [allMessages]);
 
   if (!loaded) {
     return (
@@ -150,31 +150,32 @@ useEffect(()=>{
               {chat_user}
             </p>
           </div>
-          <IconButton className={"icon" + (lightTheme ? "" : " dark")}>
-            <DeleteIcon />
-          </IconButton>
+          
         </div>
-        <div className={"messages-container" + (lightTheme ? "" : " dark")}>
-  {allMessages
-    .slice(0)
-    .reverse()
-    
-    .map((message, index) => {
-      const sender = message.sender;
-      const self_id = userData.data._id;
-      if (sender._id === self_id) {
-        return <MessageSelf props={message} key={index} />;
-      } else {
-        return <MessageOthers props={message} key={index} />;
-      }
-    })}
-</div>
-       
+        <div
+          ref={messagesContainerRef} // Attach ref to the chat container
+          className={"messages-container" + (lightTheme ? "" : " dark")}
+        >
+          {allMessages
+            .slice(0)
+            .map((message, index) => {
+              const sender = message.sender;
+              const self_id = userData.data._id;
+              if (sender._id === self_id) {
+                return <MessageSelf props={message} key={index} />;
+              } else {
+                return <MessageOthers props={message} key={index} />;
+              }
+            })}
+        </div>
+
         <div className={"text-input-area" + (lightTheme ? "" : " dark")}>
-          <input
+          <input 
+
             placeholder="Type a Message"
             className={"search-box" + (lightTheme ? "" : " dark")}
             value={messageContent}
+            
             onChange={(e) => {
               setMessageContent(e.target.value);
             }}
@@ -185,7 +186,12 @@ useEffect(()=>{
                 setRefresh(!refresh);
               }
             }}
-          />
+
+          /> <div className="send-attach">
+          <input onChange={fileSelected} ref={fileRef} type="file" style={{display:"none"}} />
+          <IconButton onClick={selectFile}>
+            <AttachmentIcon/>
+            </IconButton>
           <IconButton
             className={"icon" + (lightTheme ? "" : " dark")}
             onClick={() => {
@@ -195,6 +201,7 @@ useEffect(()=>{
           >
             <SendIcon />
           </IconButton>
+          </div>
         </div>
       </div>
     );

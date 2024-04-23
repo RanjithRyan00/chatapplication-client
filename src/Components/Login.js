@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import logo from "../chat1.png";
+import logo from "../icon.png";
 import { Button, TextField } from '@mui/material';
 import Toaster from "./Toaster";
 import { useNavigate } from 'react-router-dom';
