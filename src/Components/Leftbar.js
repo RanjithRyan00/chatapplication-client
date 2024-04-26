@@ -12,18 +12,16 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../Features/themeSlice";
 import axios from "axios";
-import { refreshSidebarFun } from "../Features/refreshSidebar";
 import { myContext } from "./MainContainer";
-import "./Mystyles.css"
 
 function Leftbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const lightTheme = useSelector((state) => state.themeKey);
   const { refresh, setRefresh } = useContext(myContext);
-  console.log("Context API : refresh : ", refresh);
   const [conversations, setConversations] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+
   const userData = JSON.parse(localStorage.getItem("userData"));
   const nav = useNavigate();
 
@@ -47,6 +45,21 @@ function Leftbar() {
     });
   }, [refresh]);
 
+  // Function to handle search input change
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Filter conversations based on search query
+  const filteredConversations = conversations.filter((conversation) => {
+    const chatName = conversation.isGroupChat
+      ? conversation.chatName
+      : conversation.users.find((user) => user._id !== userData.data._id).name;
+    return chatName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  
+  
   return (
     <div className="sidebar-container">
       <div className={"sb-header" + (lightTheme ? "" : " dark")}>
@@ -60,6 +73,7 @@ function Leftbar() {
               className={"icon" + (lightTheme ? "" : " dark")}
             />
           </IconButton>
+
           <IconButton
             onClick={() => {
               navigate("user");
@@ -71,8 +85,10 @@ function Leftbar() {
             onClick={() => {
               navigate("groups");
             }}
+            className="tiptool"
           >
             <GroupAddIcon className={"icon" + (lightTheme ? "" : " dark")} />
+            <span className="tooltiptext">Available Groups</span>
           </IconButton>
           <IconButton
             onClick={() => {
@@ -81,6 +97,7 @@ function Leftbar() {
           >
             <AddCircleIcon className={"icon" + (lightTheme ? "" : " dark")} />
           </IconButton>
+
           <IconButton
             onClick={() => {
               dispatch(toggleTheme());
@@ -112,18 +129,28 @@ function Leftbar() {
         <input
           placeholder="Search"
           className={"search-box" + (lightTheme ? "" : " dark")}
+          value={searchQuery} // Bind value to searchQuery state
+          onChange={handleSearch} // Call handleSearch function on input change
         />
       </div>
-      <div className={"sb-conversations" + (lightTheme ? "" : " dark")}>
-        {conversations.map((conversation, index) => {
-          if (conversation.users.length === 1) {
-            return <div key={index}></div>;
+      <div className={"sb-conversation" + (lightTheme ? "" : " dark")}>
+        {filteredConversations.map((conversation, index) => {
+          var chatName = " ";
+          if (conversation.isGroupChat) {
+            chatName = conversation.chatName;
+          } else {
+            conversation.users.map((user) => {
+              if (user._id != userData.data._id) {
+                chatName = user.name;
+              }
+            });
           }
           if (conversation.latestMessage === undefined) {
             return (
               <div
                 key={index}
                 onClick={() => {
+                  console.log("Refresh fired from sidebar");
                   setRefresh(!refresh);
                 }}
               >
@@ -134,17 +161,17 @@ function Leftbar() {
                     navigate(
                       "chat/" +
                       conversation._id +
-                      "&" +
-                      conversation.users[1].name
+                      "&" + chatName
                     );
                   }}
                 >
                   <p className={"con-icon" + (lightTheme ? "" : " dark")}>
-                    {conversation.users[1].name[0]}
+                    {chatName[0]}
                   </p>
                   <p className={"con-title" + (lightTheme ? "" : " dark")}>
-                    {conversation.users[1].name}
+                    {chatName}
                   </p>
+
                   <p className="con-lastMessage">
                     No previous Messages, click here to start a new chat
                   </p>
@@ -152,9 +179,6 @@ function Leftbar() {
               </div>
             );
           } else {
-            const otherUser = conversation.users.find(
-              user => user._id !== userData.data._id
-            );
             return (
               <div
                 key={index}
@@ -164,19 +188,22 @@ function Leftbar() {
                     "chat/" +
                     conversation._id +
                     "&" +
-                    otherUser.name
+                    chatName
                   );
                 }}
               >
                 <p className={"con-icon" + (lightTheme ? "" : " dark")}>
-                  {otherUser.name[0]}
+                  {chatName[0]}
                 </p>
                 <p className={"con-title" + (lightTheme ? "" : " dark")}>
-                  {otherUser.name}
+                  {chatName}
                 </p>
                 <p className="con-lastMessage">
                   {conversation.latestMessage.content}
                 </p>
+                {/* <p className={"con-timeStamp" + (lightTheme ? "" : " dark")}>
+                  {formatTimestamp(currentTimestamp)}
+                </p> */}
               </div>
             );
           }

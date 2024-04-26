@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../chat1.png";
+import logo from "../icon.png";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";

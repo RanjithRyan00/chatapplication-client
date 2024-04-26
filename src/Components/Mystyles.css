@@ -7,6 +7,26 @@
     height: 1.25em !important;
 
 }
+.tiptool{
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+.tiptool .tooltiptext{
+    visibility: hidden;
+    background-color: rgb(243 243 243 / 16%);
+    color: #e3e3e3;
+    text-align: center;
+    border-radius: 9px;
+    padding: 3px 0;
+    z-index: 1;
+    position: fixed;
+    font-size: x-small;
+    top: 42px;
+}
+.tiptool:hover .tooltiptext{
+    visibility: visible;
+}
 .main-container{
     background-color: #FCF6f5ff;
     height: 90vh;
@@ -17,17 +37,19 @@
 }
 .sidebar-container{
     display: flex;
+    background-color: #fff;
+    
     flex-direction: column;
     flex:0.3;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 }
 .chatArea-container{
-   background-color: #990011ff;
+   background-color: #628a5c;
     flex:0.7;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 }
 .sb-header{
-    background-color: #ffff;
+    background-color: #086157d5;
     border-radius: 20px;
     padding:10px 5px;
     margin:10px;
@@ -36,7 +58,8 @@
 }
 .sb-search{
 
-    background-color:#ffff;
+    background-color: #08615744;
+
     border-radius: 20px;
     padding:10px 5px;
     margin:10px;
@@ -53,7 +76,7 @@
 }
 .sb-conversation{
 
-    background-color: #FF8928;
+    background-color: #bddfca8c;;
     border-radius:20px;
     padding:10px 5px;
     margin:10px;
@@ -80,20 +103,20 @@
     background-color: rgba(245, 245, 245, 0.466);
 }
 .conversation-container:active{
-    background-color: rgba(153, 0, 18, 0.212);
+    background-color: rgba(0, 0, 0, 0.301);
 
 }
 .con-icon{
      grid-area: 1/1/3/2;
-
+    margin-right: 5px;
      display: flex;
      justify-content: center;
      align-items: center;
 
-     background-color: #FF414E;
+     background-color: #128c7ecf;
 
-     font-family: "Georgia (serif)";
-     font-size: 2rem;
+     font-family: "Poppins";
+     font-size: 1.3rem;
      font-weight: bolder;
      color:white;
      height:32px;
@@ -106,17 +129,20 @@
 }
 .con-title{
     grid-area: 1/2/2/4;
-    font-family: Georgia, 'Times New Roman', Times, serif;
-   font-weight: bold    ;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    
     color:black;
 }
 .con-lastMessage{
-    font-family: cursive;
+    font-family: "Poppins", sans-serif;
     font-size: 0.75rem;
 }
 .con-timeStamp{
     justify-self: flex-end;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif0;
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
     font-size: 0.75rem;
 
     color: rgba(93, 93, 104, 0.274);
@@ -129,32 +155,44 @@
 }
 .con-title1{
     grid-area: 1/2/2/4;
-    font-family: Georgia, 'Times New Roman', Times, serif;
-   font-weight: bold    ;
-    color:rgb(255, 255, 255);
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: large;
+    color:rgb(0, 0, 0);
 
 }
 .chatArea-header{
-    display:grid;
+    background-color: rgba(252, 246, 245, 0.87);
+    display:flex;
+    align-items: center;
     grid-template-columns: 32px auto auto;
     grid-template-rows: auto auto;
     column-gap:10px;
-    font-family: "Georgia (serif)";
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-size: 25px;
+    font-style: normal;
+ 
      font-size: 2rem;
      font-weight: bolder;
-     color:rgb(190, 11, 11);
-    padding: 5px;
+     color: #78a799;
+    padding: 10px;
     margin:5px;
-    border-radius:20px;
+    margin-top: 10px;
+    border-radius:15px;
 }
 .messages-container{
-background-color: rgba(252, 246, 245, 0.658);
-padding:10px 10px;
-margin: 10px;
-border-radius: 20px;
-flex: 1;
-overflow: scroll;
-scrollbar-width: none;
+    background-image: url(../bg.png);
+    /* backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px); */
+    padding: 10px;
+    margin: 10px;
+    border-radius: 20px;
+    flex: 1;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    scroll-behavior: smooth; /* Smooth scrolling behavior */
 }
 .messages-container::-webkit-scrollbarz
 {
@@ -169,7 +207,13 @@ scrollbar-width: none;
     border-radius: 20px;
     display: flex;
     justify-content: space-between;
+
 }
+.send-attch{
+    display: flex;
+    flex-direction: flex-end;
+}
+
 .header-text{
     display: flex;
     flex-direction: column;
@@ -182,6 +226,8 @@ scrollbar-width: none;
     justify-content: flex-start;
 }
 .self-message-container{
+    font-family: "Poppins";
+    font-size: 14px;
     display:flex;
     justify-content: flex-end;
 
@@ -195,7 +241,10 @@ scrollbar-width: none;
     padding: 10px 10px;
     margin:5px;
     border-radius: 20px ;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+ 
     
     
 }
@@ -203,7 +252,10 @@ scrollbar-width: none;
     align-self: flex-end;
     font-size: 0.25rem;
     font-weight: lighter;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+ 
 
 }
 .other-text-content{
@@ -219,12 +271,15 @@ scrollbar-width: none;
 .welcome-container{
     flex: 0.7;
     display: flex;
-    background-color: #990011ff;
+    background-color: #628A5C;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+ 
     color: #FCF6f5ff;
     border-bottom: 5px solid #FCF6f5ff;;
     border-radius: 20px;
@@ -237,7 +292,7 @@ scrollbar-width: none;
     align-self: center;
     padding: 20px 10px;
     margin: 10px;
-    background-color: #990011ff;
+    background-color: #628A5C;
     border-radius: 20px;
     display: flex;
     justify-content: space-between;
@@ -246,10 +301,10 @@ scrollbar-width: none;
 .login-container{
     height: 90vh;
     width: 90vw;
-    background-color: #990011ff;
+    background-color: #628A5C;
     border-radius: 20px;
     display: flex;
-    box-shadow: rgba(161, 57, 66, 0.534) 0px 3px 8px;
+    box-shadow: rgba(4, 20, 9, 0.726) 0px 3px 8px;
 }
 .image-container{
     flex: 0.3;
@@ -262,21 +317,25 @@ scrollbar-width: none;
 .login-box{
     flex: 0.7;
     background-color: #fcf6f5ff;
+    backdrop-filter: blur(8px);
     border-radius: 20px;
     margin: 10px;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    color: #990011ff;
+    font-family: "Poppins", sans-serif;
+
+    font-style: normal;
+ 
+    color: rgb(29, 3, 6);
     font-weight: bolder;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    box-shadow: rgba(153, 0, 18, 0.452) 0px 50px 100px -20px, rgba(153, 0, 18, 0.452) 0px 30px 60px -30px, rgba(153, 0, 18, 0.452) 0px -2px 6px 0px inset;
+    box-shadow: rgba(56, 53, 54, 0.452) 0px 50px 100px -20px, rgba(24, 19, 19, 0.452) 0px 30px 60px -30px, rgba(27, 25, 25, 0.452) 0px -2px 6px 0px inset;
 }
 .list-container{
     flex: 0.7;
-    background-color: #990011ff;
+    background-color: #628A5C;
 }
 .ug-header{
     background-color: #fcf6f5ff;
@@ -290,8 +349,11 @@ scrollbar-width: none;
 .ug-title{
     color:rgb(0,0,0,0.54);
     margin: 20px;
-    font-family: 'Times New Roman', Times, serif;
-    font-weight: bolder;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+ 
+
 }
 .ug-list{
 flex: 1;
@@ -309,7 +371,7 @@ scrollbar-width: none;
     align-items: center;
     background-color: #FCF6f5ff;
     border-radius: 20px;
-    padding: 10px,5px;
+    padding: 10px;
     margin: 10px;
     height: 50px;
     transition-duration: 0.5s;
@@ -341,6 +403,7 @@ scrollbar-width: none;
     }
     .sidebar-container{
         flex:0;
+
     
     }
     .main-container{
