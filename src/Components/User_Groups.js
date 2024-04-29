@@ -24,7 +24,7 @@ function User_Groups() {
    const userData = JSON.parse(localStorage.getItem("userData"));
    // console.log("Data from LocalStorage : ", userData);
    const nav = useNavigate();
-   if (!userData) {``
+   if (!userData) {
      console.log("User not Authenticated");
      nav("/");
    }
