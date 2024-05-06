@@ -16,7 +16,7 @@ function Welcome() {
     return null;  // Return null or a loading state/component
   }
 
-  console.log(userData);
+  // console.log(userData);
 
   return (
     <div className={"welcome-container" + (lightTheme ? "" : " dark")}>

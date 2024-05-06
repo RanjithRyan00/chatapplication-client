@@ -13,6 +13,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../Features/themeSlice";
 import axios from "axios";
 import { myContext } from "./MainContainer";
+import io from "socket.io-client";
+import { UserContext } from "../App";
+
+const ENDPOINT = "http://localhost:8080";
 
 function Leftbar() {
   const navigate = useNavigate();
@@ -21,7 +25,7 @@ function Leftbar() {
   const { refresh, setRefresh } = useContext(myContext);
   const [conversations, setConversations] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
-
+  const {globalSocket, setGlobalSocket} = useContext(UserContext)
   const userData = JSON.parse(localStorage.getItem("userData"));
   const nav = useNavigate();
 
@@ -32,18 +36,48 @@ function Leftbar() {
 
   const user = userData.data;
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    };
+  const getConversations = async () => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
 
-    axios.get("http://localhost:8080/chat/", config).then((response) => {
-      console.log("Data refresh in sidebar ", response.data);
-      setConversations(response.data);
-    });
+      const response = await axios.get("http://localhost:8080/chat/", config);
+      if (response) {
+        setConversations(response.data);
+      }
+    } catch (error) {
+      console.log("Error occured while getting Conversations");
+    }
+  };
+
+  useEffect(() => {
+    getConversations();
   }, [refresh]);
+
+  useEffect(() => {
+    // const socket = io(ENDPOINT);
+    if (globalSocket) {
+      globalSocket.on("connect", () => {
+        console.log("Socket connected on left bar");
+      });
+
+      globalSocket.on("disconnect", () => {
+        console.log("Socket disconnected");
+      });
+
+      globalSocket.on("message received", (message) => {
+        console.log("Left bar is refreshed due to new message");
+        getConversations();
+        // setRefresh(prevState => !prevState)
+      });
+    }
+    return () => {
+      // globalSocket.disconnect(); // Disconnect socket when component unmounts
+    };
+  }, [globalSocket]);
 
   // Function to handle search input change
   const handleSearch = (e) => {
@@ -58,13 +92,11 @@ function Leftbar() {
     return chatName.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
-  
-  
   return (
     <div className="sidebar-container">
       <div className={"sb-header" + (lightTheme ? "" : " dark")}>
         <div className="other-icons">
-          <IconButton
+          <IconButton 
             onClick={() => {
               nav("/app/welcome");
             }}
@@ -80,6 +112,7 @@ function Leftbar() {
             }}
           >
             <PersonAddIcon className={"icon" + (lightTheme ? "" : " dark")} />
+            {/* <span className="tooltiptext">Available User</span> */}
           </IconButton>
           <IconButton
             onClick={() => {
@@ -135,7 +168,7 @@ function Leftbar() {
       </div>
       <div className={"sb-conversation" + (lightTheme ? "" : " dark")}>
         {filteredConversations.map((conversation, index) => {
-          var chatName = " ";
+          let chatName;
           if (conversation.isGroupChat) {
             chatName = conversation.chatName;
           } else {
@@ -145,7 +178,7 @@ function Leftbar() {
               }
             });
           }
-          if (conversation.latestMessage === undefined) {
+          if (!conversation.latestMessage) {
             return (
               <div
                 key={index}
@@ -158,20 +191,17 @@ function Leftbar() {
                   key={index}
                   className="conversation-container"
                   onClick={() => {
-                    navigate(
-                      "chat/" +
-                      conversation._id +
-                      "&" + chatName
-                    );
+                    navigate("chat/" + conversation._id + "&" + chatName);
                   }}
                 >
                   <p className={"con-icon" + (lightTheme ? "" : " dark")}>
-                    {chatName[0]}
+                    {" "}
+                    {chatName[0]}{" "}
                   </p>
                   <p className={"con-title" + (lightTheme ? "" : " dark")}>
-                    {chatName}
+                    {" "}
+                    {chatName}{" "}
                   </p>
-
                   <p className="con-lastMessage">
                     No previous Messages, click here to start a new chat
                   </p>
@@ -184,12 +214,7 @@ function Leftbar() {
                 key={index}
                 className="conversation-container"
                 onClick={() => {
-                  navigate(
-                    "chat/" +
-                    conversation._id +
-                    "&" +
-                    chatName
-                  );
+                  navigate("chat/" + conversation._id + "&" + chatName);
                 }}
               >
                 <p className={"con-icon" + (lightTheme ? "" : " dark")}>
@@ -199,7 +224,7 @@ function Leftbar() {
                   {chatName}
                 </p>
                 <p className="con-lastMessage">
-                  {conversation.latestMessage.content}
+                  {conversation.latestMessage.content || conversation.latestMessage.file.fileName}
                 </p>
                 {/* <p className={"con-timeStamp" + (lightTheme ? "" : " dark")}>
                   {formatTimestamp(currentTimestamp)}

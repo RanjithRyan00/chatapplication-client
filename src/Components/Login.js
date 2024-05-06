@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import logo from "../icon.png";
-import { Button, TextField } from '@mui/material';
+import { Button, TextField } from "@mui/material";
 import Toaster from "./Toaster";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';  
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 function Login() {
   const [showlogin, setShowLogin] = useState(false);
   const [data, setData] = useState({ name: "", email: "", password: "" });
@@ -17,12 +17,11 @@ function Login() {
   const navigate = useNavigate();
 
   const changeHandler = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    setData({ ...data, [e.target.email]: e.target.value });
   };
 
   const loginHandler = async (e) => {
     setLoading(true);
-    console.log(data);
     try {
       const config = {
         headers: {
@@ -32,19 +31,21 @@ function Login() {
 
       const response = await axios.post(
         "http://localhost:8080/user/login/",
-        data,
+        { email: "kishore@gmail.com", password: "123"},
         config
       );
-      console.log("Login : ", response);
-      setLogInStatus({ msg: "Success", key: Math.random() });
-      setLoading(false);
-      localStorage.setItem("userData", JSON.stringify(response));
-      navigate("/app/welcome");
+      // setLogInStatus({ msg: "Success", key: Math.random() });
+      // setLoading(false);
+      // localStorage.setItem("userData", JSON.stringify(response));
+      // navigate("/app/welcome");
+      if (response) {
+        setLogInStatus({ msg: "Success", key: Math.random() });
+        setLoading(false);
+        localStorage.setItem("userData", JSON.stringify(response));
+        navigate("/app/welcome");
+      }
     } catch (error) {
-      setLogInStatus({
-        msg: "Invalid User name or Password",
-        key: Math.random(),
-      });
+      console.log("Error Occurred:", error)
     }
     setLoading(false);
   };
@@ -57,19 +58,16 @@ function Login() {
           "Content-type": "application/json",
         },
       };
-
       const response = await axios.post(
         "http://localhost:8080/user/register/",
         data,
         config
       );
-      console.log(response);
       setSignInStatus({ msg: "Success", key: Math.random() });
       navigate("/app/welcome");
       localStorage.setItem("userData", JSON.stringify(response));
       setLoading(false);
     } catch (error) {
-      console.log(error);
       if (error.response.status === 405) {
         setLogInStatus({
           msg: "User with this email ID already Exists",
@@ -103,14 +101,13 @@ function Login() {
             <p className="login-text">Login to your Account</p>
             <TextField
               onChange={changeHandler}
-              id="standard-basic"
-              label="Enter User Name"
+              className="standard-basic"
+              label="Enter User Email"
               variant="outlined"
               color="secondary"
-              name="name"
+              name="email"
               onKeyDown={(event) => {
                 if (event.code === "Enter") {
-                  // console.log(event);
                   loginHandler();
                 }
               }}
@@ -125,7 +122,6 @@ function Login() {
               name="password"
               onKeyDown={(event) => {
                 if (event.code === "Enter") {
-                  // console.log(event);
                   loginHandler();
                 }
               }}
@@ -159,7 +155,7 @@ function Login() {
             <p className="login-text">Create your Account</p>
             <TextField
               onChange={changeHandler}
-              id="standard-basic"
+              className="standard-basic"
               label="Enter User Name"
               variant="outlined"
               color="secondary"
@@ -167,21 +163,19 @@ function Login() {
               helperText=""
               onKeyDown={(event) => {
                 if (event.code === "Enter") {
-                  // console.log(event);
                   signUpHandler();
                 }
               }}
             />
             <TextField
               onChange={changeHandler}
-              id="standard-basic"
+              className="standard-basic"
               label="Enter Email Address"
               variant="outlined"
               color="secondary"
               name="email"
               onKeyDown={(event) => {
                 if (event.code === "Enter") {
-                  // console.log(event);
                   signUpHandler();
                 }
               }}
@@ -196,7 +190,6 @@ function Login() {
               name="password"
               onKeyDown={(event) => {
                 if (event.code === "Enter") {
-                  // console.log(event);
                   signUpHandler();
                 }
               }}
