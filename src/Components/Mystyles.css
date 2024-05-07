@@ -382,6 +382,51 @@ scrollbar-width: none;
 .list-tem:active{
     background-color: white
 }
+
+.pdf-card{
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 300px;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+.pdf-card-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+.pdf-card-body {
+    padding: 20px;
+}
+.pdf-icon {
+    display: block;
+    text-align: center;
+    font-size: 48px;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+.pdf-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.pdf-info {
+    font-size: 14px;
+    color: #666;
+}
+.pdf-download-view-div{
+    display: flex;
+    justify-content: space-between;
+}
+.pdf-icon-title-div{
+    display: flex;
+    justify-content: start;
+}
 @media only screen and (max-width:40em){
     .sb-search{
         display: none;

@@ -11,18 +11,23 @@ import AttachmentIcon from "@mui/icons-material/Attachment";
 import axios from "axios";
 import { myContext } from "./MainContainer";
 import io from "socket.io-client";
+import { UserContext } from "../App";
+
 
 const ENDPOINT = "http://localhost:8080";
 
 function ChatArea() {
+  //Getting userData from the local storage for the Authentication.
   const userData = JSON.parse(localStorage.getItem("userData"));
+
+  //Retrieving details from params of the url.
+  const chatParams = useParams();
+  const [chat_id, chat_user] = chatParams._id
+  ? chatParams._id.split("&")
+  : ["", ""];
+  const{globalSocket,setGlobalSocket}=useContext(UserContext)
   const [messageContent, setMessageContent] = useState("");
   const [fileContent, setFileContent] = useState("");
-  const chatParams = useParams();
-
-  const [chat_id, chat_user] = chatParams._id
-    ? chatParams._id.split("&")
-    : ["", ""];
   const [allMessages, setAllMessages] = useState([]);
   const { refresh, setRefresh } = useContext(myContext);
   const [loaded, setLoaded] = useState(false);
@@ -32,6 +37,13 @@ function ChatArea() {
   const lightTheme = useSelector((state) => state.themeKey);
   const messagesContainerRef = useRef(null); // Create a ref for the chat container
   const fileRef = useRef();
+  let fileInfo = {
+    fileName : '',
+    fileSize : '',
+    fileType : '',
+    fileUrl : ''
+  }
+  // const  { setRefreshLeftbar } = useContext(LeftbarContext);
 
   function selectFile() {
     fileRef.current.click();
@@ -40,16 +52,19 @@ function ChatArea() {
   function fileSelected(e) {
     const file = e.target.files[0];
     if (!file) return;
+
+    fileInfo.fileName = file.name;
+    fileInfo.fileSize = file.size;
+    fileInfo.fileType = file.type;
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
       const data = reader.result;
-      // console.log(data);
-      setFileContent(data);
-      sendMessage(data);
-      // socket.emit('upload', { data });
+      fileInfo.fileUrl = data;
+      setFileContent(fileInfo);
+      sendMessage(fileInfo);
     };
-    // console.log(fileContent)
   }
 
   const sendMessage = (data) => {
@@ -61,7 +76,7 @@ function ChatArea() {
         "http://localhost:8080/message/",
         {
           content: messageContent,
-          file: data,
+          file: data || "",
           chatId: chat_id,
         },
         config
@@ -70,12 +85,14 @@ function ChatArea() {
         const data = response.data;
         console.log("Message Fired");
         socket.emit("newMessage", data); // Emitting the message
+        setGlobalSocket(socket);
         getChatMessages();
       })
       .catch((error) => {
         console.error("Error sending message:", error);
       });
   };
+
   const getChatMessages = () => {
     axios
       .get(`http://localhost:8080/message/${chat_id}`, {
@@ -84,7 +101,7 @@ function ChatArea() {
         },
       })
       .then(({ data }) => {
-        console.log(data);
+        // console.log(data);
         setAllMessages(data);
         setLoaded(true);
       })
@@ -94,8 +111,17 @@ function ChatArea() {
   };
 
   useEffect(() => {
+    // Scroll to the bottom of the chat container whenever allMessages updates
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [allMessages]);
+
+  useEffect(() => {
     const socket = io(ENDPOINT);
     socket.emit("setup", userData);
+
     socket.on("connect", () => {
       setSocketConnectionStatus(true);
       setSocket(socket); // Save the socket instance in state
@@ -108,13 +134,13 @@ function ChatArea() {
 
     if (socket) {
       socket.on("message received", (message) => {
-        // Handle received message
+        // Handle when a new message is received.
+        console.log(`New Message received from ${message.sender}`);
+        getChatMessages();
       });
-    }
 
-    if (socket) {
       socket.on("uploaded", (data) => {
-        // Handle uploaded file
+              // Handle uploaded file
       });
     }
 
@@ -125,52 +151,13 @@ function ChatArea() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("message received", (message) => {
-  //       // Handle received message
-  //     });
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("uploaded", (data) => {
-  //       // Handle uploaded file
-  //     });
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (socket && chat_id) {
-      socket.emit("join chat", chat_id);
+      socket.emit("joinChat", chat_id);
       getChatMessages();
     }
   }, [socket, chat_id]);
 
-  // const getAllMessages = () => {
-  //   axios
-  //     .get(`http://localhost:8080/message/${chat_id}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${userData.data.token}`,
-  //       },
-  //     })
-  //     .then(({ data }) => {
-  //       setAllMessages(data);
-  //       setLoaded(true);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching messages:", error);
-  //     });
-  // };
-  
-  useEffect(() => {
-    // Scroll to the bottom of the chat container whenever allMessages updates
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
-    }
-  }, [allMessages]);
 
   if (!loaded) {
     return (
@@ -222,13 +209,7 @@ function ChatArea() {
           className={"messages-container" + (lightTheme ? "" : " dark")}
         >
           {allMessages.slice(0).map((message, index) => {
-            const sender = message.sender;
-            const self_id = userData.data._id;
-            if (sender._id === self_id) {
-              return <MessageSelf props={message} key={index} />;
-            } else {
-              return <MessageOthers props={message} key={index} />;
-            }
+            return <MessageSelf props={message} key={index} userData={userData} />
           })}
         </div>
 
@@ -243,7 +224,7 @@ function ChatArea() {
             onKeyDown={(event) => {
               if (event.code === "Enter") {
                 sendMessage();
-                setMessageContent("");
+                setMessageContent(" ");
                 setRefresh(!refresh);
               }
             }}
