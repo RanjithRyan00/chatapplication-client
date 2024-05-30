@@ -17,7 +17,7 @@ function Login() {
   const navigate = useNavigate();
 
   const changeHandler = (e) => {
-    setData({ ...data, [e.target.email]: e.target.value });
+    setData({ ...data, [e.target.name]: e.target.value });
   };
 
   const loginHandler = async (e) => {
@@ -31,7 +31,7 @@ function Login() {
 
       const response = await axios.post(
         "http://localhost:8080/user/login/",
-        { email: "kishore@gmail.com", password: "123"},
+       data,
         config
       );
       // setLogInStatus({ msg: "Success", key: Math.random() });

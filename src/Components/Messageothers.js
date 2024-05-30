@@ -1,78 +1,141 @@
-import "./Mystyles.css"
-import React from "react";
+import React, { useEffect, useState } from "react";
+import DownloadIcon from "@mui/icons-material/Download";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { getUserInfo } from "../shared/getUserInfo";
 import { useDispatch, useSelector } from "react-redux";
 
-function Messageothers({props}) {
-  const getFileType = (url) => {
-    if (!url) {
-      return null;
-    }
-    if (url.startsWith("data:application/pdf")) {
-      return "pdf";
-    } else if (
-      url.startsWith("data:image/jpeg") ||
-      url.startsWith("data:image/png")
-    ) {
-      return "image";
-    } else if (
-      url.startsWith("data:application/vnd.openxmlformats-officedocument")
-    ) {
-      return "excel";
-    }
-    return null;
-  };
+function MessageOthers({ props, userData,sender }) {
+  const [userId, setUserId] = useState(userData.data._id);
+  console.log(props)
+  console.log(sender[0],"sender detail")
+  let content;
+  // let fileType;
+  // console.log("Props:", props);
+  // console.log('user-data:',userId);
 
-  const renderPdf = (url) => {
-    return (
-      // <embed src={url} type="application/pdf" width="100%" height="600px" />
-      <div className="pdf-card">
-        <div className="pdf-card-header"> PDF Document </div>
-        <div className="pdf-card-body">
-          <div className="pdf-icon">
-            <i className="fa fa-file-pdf-o" ></i>
-          </div>
-          <div class="pdf-title">
-                Document Title
-            </div>
-            <div class="pdf-info">
-                Uploaded by User on Date
-            </div>
-            <a href="#" class="button">View PDF</a>
-        </div>
-      </div>
-    );
-  };
+  // function base64toBlob(base64Data, contentType = "", sliceSize = 512) {
+  //   const byteCharacters = atob(base64Data);
+  //   const byteArrays = [];
 
-  const renderImage = (url) => {
-    return <img src={url} alt="image" width="200" />;
-  };
+  //   for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+  //     const slice = byteCharacters.slice(offset, offset + sliceSize);
 
-  const fileType = getFileType(props.file);
+  //     const byteNumbers = new Array(slice.length);
+  //     for (let i = 0; i < slice.length; i++) {
+  //       byteNumbers[i] = slice.charCodeAt(i);
+  //     }
 
-  let content = null;
+  //     const byteArray = new Uint8Array(byteNumbers);
+  //     byteArrays.push(byteArray);
+  //   }
 
-  if (fileType === "image") {
-    content = renderImage(props.file);
-  } else if (fileType === "pdf") {
-    content = renderPdf(props.file);
-  }
+  //   const blob = new Blob(byteArrays, { type: contentType });
+  //   return blob;
+  // }
 
-  const dispatch = useDispatch();
+  // function formatFileSize(bytes) {
+  //   if (bytes === 0) return "0 Bytes";
+  //   const k = 1024;
+  //   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  //   const i = Math.floor(Math.log(bytes) / Math.log(k));
+  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  // }
+
+  // const downloadAsPDF = async (fileInfo) => {
+  //   try {
+  //     let linkSource = fileInfo.fileUrl;
+  //     let fileName = fileInfo.fileName;
+  //     let downloadLink = document.createElement("a");
+
+  //     downloadLink.href = linkSource;
+  //     downloadLink.download = fileName;
+  //     downloadLink.click();
+  //   } catch (error) {
+  //     console.log("Error Downloading PDF..", error);
+  //   }
+  // };
+
+  // const viewAsPDF = async (fileInfo) => {
+  //   try {
+  //     const base64Parts = fileInfo.fileUrl.split(",");
+
+  //     const base64String = base64Parts[1];
+  //     const contentType = "application/pdf";
+
+  //     const blob = base64toBlob(base64String, contentType);
+  //     const pdfURL = URL.createObjectURL(blob);
+
+  //     window.open(pdfURL, "_blank");
+  //   } catch (error) {
+  //     console.log("Error Viewing the PDF", error);
+  //   }
+  // };
+
+  // const renderPdf = (fileInfo) => {
+  //   return (
+  //     <div className="pdf-card">
+  //       {/* <div className="pdf-card-header"> PDF </div> */}
+  //       <div className="pdf-card-body">
+  //         <div className="pdf-icon-title-div">
+  //           <PictureAsPdfIcon />
+  //           <div className="pdf-title">{fileInfo.fileName}</div>
+  //         </div>
+
+  //         <div className="pdf-info">
+  //           Size - {formatFileSize(fileInfo.fileSize)}
+  //         </div>
+  //         <div className="pdf-download-view-div">
+  //           <a href="#" className="button" onClick={() => viewAsPDF(fileInfo)}>
+  //             View PDF
+  //           </a>
+  //           <DownloadIcon onClick={() => downloadAsPDF(fileInfo)} />{" "}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
+  // const renderImage = (url) => {
+  //   return <img src={url} alt="image" width="200" />;
+  // };
+
+  // if (props.file) {
+  //   fileType = props.file.fileType;
+  // } else {
+  //   fileType = null;
+  // }
+
+  // if (fileType === "image/jpeg" || fileType === "image/png") {
+  //   content = renderImage(props.file.fileUrl);
+  // } else if (fileType === "application/pdf") {
+  //   content = renderPdf(props.file);
+  // }
+
   const lightTheme = useSelector((state) => state.themeKey);
-  // console.log("message others : ", props);
-  return (
+
+  return sender[0]._id === userId ? (
+    <div className="self-message-container">
+      <p className="con-icon">{sender[0].name[0]}</p>
+      {props && (
+        <div className="other-text-content ">
+          <p style={{ color: "black" }}>{props}</p>
+        </div>
+      )}
+
+    </div>
+  ) : (
     <div className={"other-message-container" + (lightTheme ? "" : " dark")}>
       <div className={"message-Box" + (lightTheme ? "" : " dark")}>
         <p className={"con-icon" + (lightTheme ? "" : " dark")}>
-          {props.sender.name[0]}
+          {sender[0].name[0]}
         </p>
         <div className={"other-text-content" + (lightTheme ? "" : " dark")}>
           <p className={"con-title" + (lightTheme ? "" : " dark")}>
-            {props.sender.name}
+            {sender[0].name}
           </p>
           <div className="other-text-content ">
-            {props.content && <p style={{ color: "black" }}>{props.content}</p>}
-            {content && <div style={{ color: "black" }}>{content}</div>}
+            {props && <p style={{ color: "black" }}>{props}</p>}
+            
           </div>
         </div>
       </div>
@@ -80,7 +143,4 @@ function Messageothers({props}) {
   );
 }
 
-
-export default Messageothers
-
-
+export default MessageOthers;

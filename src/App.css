@@ -3,7 +3,10 @@
 margin: 0;
 }
 .App{
-  background-color: #dddedd;
+  background-image: url(./Images/images.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  backdrop-filter: blur(15px);
   min-height: 100vh;
   display: flex;
   justify-content: center;

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";
+import TranslateIcon from "@mui/icons-material/Translate";
 import SendIcon from "@mui/icons-material/Send";
 import MessageSelf from "./Messageself";
 import MessageOthers from "./Messageothers";
@@ -12,38 +13,41 @@ import axios from "axios";
 import { myContext } from "./MainContainer";
 import io from "socket.io-client";
 import { UserContext } from "../App";
-
+import useTranslate from "../hooks/useTranslate"; // Importing the translation hook
 
 const ENDPOINT = "http://localhost:8080";
 
 function ChatArea() {
-  //Getting userData from the local storage for the Authentication.
   const userData = JSON.parse(localStorage.getItem("userData"));
-
-  //Retrieving details from params of the url.
   const chatParams = useParams();
   const [chat_id, chat_user] = chatParams._id
-  ? chatParams._id.split("&")
-  : ["", ""];
-  const{globalSocket,setGlobalSocket}=useContext(UserContext)
+    ? chatParams._id.split("&")
+    : ["", ""];
+  const { globalSocket, setGlobalSocket } = useContext(UserContext);
   const [messageContent, setMessageContent] = useState("");
   const [fileContent, setFileContent] = useState("");
   const [allMessages, setAllMessages] = useState([]);
   const { refresh, setRefresh } = useContext(myContext);
   const [loaded, setLoaded] = useState(false);
   const [socketConnectionStatus, setSocketConnectionStatus] = useState(false);
-  const [socket, setSocket] = useState(null); // State to hold the socket instance
+  const [socket, setSocket] = useState(null);
   const [chat, setChat] = useState([]);
   const lightTheme = useSelector((state) => state.themeKey);
-  const messagesContainerRef = useRef(null); // Create a ref for the chat container
+  const messagesContainerRef = useRef(null);
   const fileRef = useRef();
+  const { translatedText, error, translate } = useTranslate(); // Using the translation hook
+  const [targetLang, setTargetLang] = useState("ta"); // Default to Telugu
+  const [translatedMessages, setTranslatedMessages] = useState([]);
+  const [translations, setTranslations] = useState("en");
+  // const content = ["content"]; // Example array of messages
+  let sender;
+
   let fileInfo = {
-    fileName : '',
-    fileSize : '',
-    fileType : '',
-    fileUrl : ''
-  }
-  // const  { setRefreshLeftbar } = useContext(LeftbarContext);
+    fileName: "",
+    fileSize: "",
+    fileType: "",
+    fileUrl: "",
+  };
 
   function selectFile() {
     fileRef.current.click();
@@ -84,7 +88,7 @@ function ChatArea() {
       .then((response) => {
         const data = response.data;
         console.log("Message Fired");
-        socket.emit("newMessage", data); // Emitting the message
+        socket.emit("newMessage", data);
         setGlobalSocket(socket);
         getChatMessages();
       })
@@ -101,7 +105,6 @@ function ChatArea() {
         },
       })
       .then(({ data }) => {
-        // console.log(data);
         setAllMessages(data);
         setLoaded(true);
       })
@@ -109,9 +112,8 @@ function ChatArea() {
         console.error("Error fetching messages:", error);
       });
   };
-
+  console.log(allMessages, "data");
   useEffect(() => {
-    // Scroll to the bottom of the chat container whenever allMessages updates
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
@@ -124,23 +126,21 @@ function ChatArea() {
 
     socket.on("connect", () => {
       setSocketConnectionStatus(true);
-      setSocket(socket); // Save the socket instance in state
+      setSocket(socket);
     });
 
-    // Error handling for WebSocket connection
     socket.on("error", (error) => {
       console.error("WebSocket connection error:", error);
     });
 
     if (socket) {
       socket.on("message received", (message) => {
-        // Handle when a new message is received.
         console.log(`New Message received from ${message.sender}`);
         getChatMessages();
       });
 
       socket.on("uploaded", (data) => {
-              // Handle uploaded file
+        // Handle uploaded file
       });
     }
 
@@ -157,7 +157,27 @@ function ChatArea() {
       getChatMessages();
     }
   }, [socket, chat_id]);
-
+  const contents = allMessages.map((message) => message.content);
+  sender = allMessages.map((message) => message.sender);
+  console.log(sender);
+  const handleTranslateAll = async () => {
+    try {
+      const translated = await Promise.all(
+        contents.map((message) => {
+          return translate(message, "en", targetLang);
+        })
+      );
+      setTranslations(targetLang);
+      console.log("Translated", translated);
+      setTranslatedMessages(translated);
+    } catch (error) {
+      console.error("Error translating messages:", error);
+    }
+  };
+console.log(allMessages,"allmessage_data")
+  // const translatetext=()=>{
+  //   translate(allMessages.join(' '), 'en', targetLang); // Translating all messages
+  // }
 
   if (!loaded) {
     return (
@@ -203,14 +223,40 @@ function ChatArea() {
               {chat_user}
             </p>
           </div>
+          <div>
+            <TranslateIcon onClick={handleTranslateAll} />
+            <select
+              value={targetLang}
+              onChange={(e) => setTargetLang(e.target.value)}
+            >
+              <option value="ta">Tamil</option>
+              <option value="te">Telugu</option>
+              <option value="hi">Hindi</option>
+              <option value="kn">Kannada</option>
+              <option value="ml">Malayalam</option>
+              {/* Add more languages as needed */}
+            </select>
+          </div>
         </div>
+
         <div
-          ref={messagesContainerRef} // Attach ref to the chat container
+          ref={messagesContainerRef}
           className={"messages-container" + (lightTheme ? "" : " dark")}
         >
-          {allMessages.slice(0).map((message, index) => {
-            return <MessageSelf props={message} key={index} userData={userData} />
-          })}
+          {translations == "en"
+            ? // Render original messages if translations are available
+              allMessages.map((message, index) => (
+                <MessageSelf props={message} key={index} userData={userData} />
+              ))
+            : // Render translated messages if translations are not available
+              translatedMessages.map((message, index) => (
+                <MessageOthers
+                  props={message}
+                  key={index}
+                  sender={sender}
+                  userData={userData}
+                />
+              ))}
         </div>
 
         <div className={"text-input-area" + (lightTheme ? "" : " dark")}>
