@@ -25,7 +25,7 @@ function Leftbar() {
   const { refresh, setRefresh } = useContext(myContext);
   const [conversations, setConversations] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
-  const {globalSocket, setGlobalSocket} = useContext(UserContext)
+  const { globalSocket, setGlobalSocket } = useContext(UserContext);
   const userData = JSON.parse(localStorage.getItem("userData"));
   const nav = useNavigate();
 
@@ -96,7 +96,7 @@ function Leftbar() {
     <div className="sidebar-container">
       <div className={"sb-header" + (lightTheme ? "" : " dark")}>
         <div className="other-icons">
-          <IconButton 
+          <IconButton
             onClick={() => {
               nav("/app/welcome");
             }}
@@ -165,6 +165,14 @@ function Leftbar() {
           value={searchQuery} // Bind value to searchQuery state
           onChange={handleSearch} // Call handleSearch function on input change
         />
+       
+          <div
+            className="chat-icon"
+            onClick={() => {
+              navigate("chatbot");
+            }}
+          ></div>
+       
       </div>
       <div className={"sb-conversation" + (lightTheme ? "" : " dark")}>
         {filteredConversations.map((conversation, index) => {
@@ -224,7 +232,8 @@ function Leftbar() {
                   {chatName}
                 </p>
                 <p className="con-lastMessage">
-                  {conversation.latestMessage.content || conversation.latestMessage.file.fileName}
+                  {conversation.latestMessage.content ||
+                    conversation.latestMessage.file.fileName}
                 </p>
                 {/* <p className={"con-timeStamp" + (lightTheme ? "" : " dark")}>
                   {formatTimestamp(currentTimestamp)}
