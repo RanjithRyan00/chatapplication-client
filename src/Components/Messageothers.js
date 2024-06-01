@@ -6,8 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 function MessageOthers({ props, userData,sender }) {
   const [userId, setUserId] = useState(userData.data._id);
-  console.log(props)
-  console.log(sender[0],"sender detail")
   let content;
   // let fileType;
   // console.log("Props:", props);

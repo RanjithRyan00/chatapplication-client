@@ -112,7 +112,7 @@ function ChatArea() {
         console.error("Error fetching messages:", error);
       });
   };
-  console.log(allMessages, "data");
+  // console.log(allMessages, "data");
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -157,27 +157,43 @@ function ChatArea() {
       getChatMessages();
     }
   }, [socket, chat_id]);
-  const contents = allMessages.map((message) => message.content);
-  sender = allMessages.map((message) => message.sender);
-  console.log(sender);
+
+  // const contents = allMessages.map((message) => message.content);
+  // sender = allMessages.map((message) => message.sender);
+
+
+
   const handleTranslateAll = async () => {
     try {
-      const translated = await Promise.all(
-        contents.map((message) => {
-          return translate(message, "en", targetLang);
-        })
-      );
-      setTranslations(targetLang);
-      console.log("Translated", translated);
-      setTranslatedMessages(translated);
+      const content = allMessages.map(message => message.content);
+
+      const delimiter = '|||';
+
+      const combinedContents = content.join(delimiter);
+
+      const translatedCombinedContents = await translate(combinedContents);
+
+      // console.log(translatedCombinedContents);
+
+      const translatedContents = translatedCombinedContents.split(delimiter);
+
+      const translatedMessages = allMessages.map((message,index) => {
+        return {
+          ...message,
+          translatedContent : translatedContents[index]
+        }
+      })
+
+      if(translatedMessages){
+        // console.log("Translated Messages:", translatedMessages)
+        setTranslations(targetLang);
+        setTranslatedMessages(translatedMessages);
+      }
+
     } catch (error) {
       console.error("Error translating messages:", error);
     }
   };
-console.log(allMessages,"allmessage_data")
-  // const translatetext=()=>{
-  //   translate(allMessages.join(' '), 'en', targetLang); // Translating all messages
-  // }
 
   if (!loaded) {
     return (
@@ -223,12 +239,14 @@ console.log(allMessages,"allmessage_data")
               {chat_user}
             </p>
           </div>
-          <div>
+          <div className="translation-box">
             <TranslateIcon onClick={handleTranslateAll} />
             <select
+            className="translation-selection"
               value={targetLang}
               onChange={(e) => setTargetLang(e.target.value)}
             >
+              <option value="en">English</option>
               <option value="ta">Tamil</option>
               <option value="te">Telugu</option>
               <option value="hi">Hindi</option>
@@ -250,12 +268,7 @@ console.log(allMessages,"allmessage_data")
               ))
             : // Render translated messages if translations are not available
               translatedMessages.map((message, index) => (
-                <MessageOthers
-                  props={message}
-                  key={index}
-                  sender={sender}
-                  userData={userData}
-                />
+                <MessageSelf props={message} key={index} userData={userData} />
               ))}
         </div>
 
