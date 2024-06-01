@@ -116,7 +116,7 @@ function MessageSelf({ props, userData }) {
       <p className="con-icon">{props.sender.name[0]}</p>
       {props.content && (
         <div className="other-text-content ">
-          <p style={{ color: "black" }}>{props.content}</p>
+          <p style={{ color: "black" }}>{props.translatedContent ? props.translatedContent : props.content}</p>
         </div>
       )}
       {content && <div style={{ color: "black" }}>{content}</div>}
@@ -132,7 +132,7 @@ function MessageSelf({ props, userData }) {
             {props.sender.name}
           </p>
           <div className="other-text-content ">
-            {props.content && <p style={{ color: "black" }}>{props.content}</p>}
+            {props.content && <p style={{ color: "black" }}>{props.translatedContent ? props.translatedContent : props.content}</p>}
             {content && <div style={{ color: "black" }}>{content}</div>}
           </div>
         </div>
