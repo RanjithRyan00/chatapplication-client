@@ -136,14 +136,14 @@ function Login() {
             </Button>
             <p>
               Don't have an Account ?{" "}
-              <span
-                className="hyper"
+              <button
+              class="button-62" role="button"
                 onClick={() => {
                   setShowLogin(false);
                 }}
               >
                 Sign Up
-              </span>
+              </button>
             </p>
             {logInStatus ? (
               <Toaster key={logInStatus.key} message={logInStatus.msg} />
@@ -203,14 +203,14 @@ function Login() {
             </Button>
             <p>
               Already have an Account ?
-              <span
-                className="hyper"
+              <button
+              class="button-62" role="button"
                 onClick={() => {
                   setShowLogin(true);
                 }}
               >
                 Log in
-              </span>
+              </button>
             </p>
             {signInStatus ? (
               <Toaster key={signInStatus.key} message={signInStatus.msg} />

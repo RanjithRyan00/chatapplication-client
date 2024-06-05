@@ -14,6 +14,7 @@ import { myContext } from "./MainContainer";
 import io from "socket.io-client";
 import { UserContext } from "../App";
 import useTranslate from "../hooks/useTranslate"; // Importing the translation hook
+import VoiceRecorder from "./VoiceRecorder";
 
 const ENDPOINT = "http://localhost:8080";
 
@@ -36,10 +37,11 @@ function ChatArea() {
   const messagesContainerRef = useRef(null);
   const fileRef = useRef();
   const { translatedText, error, translate } = useTranslate(); // Using the translation hook
-  const [targetLang, setTargetLang] = useState("ta"); // Default to Telugu
+  const [targetLang, setTargetLang] = useState("disabled"); // Default to tamil
   const [translatedMessages, setTranslatedMessages] = useState([]);
   const [translations, setTranslations] = useState("en");
-  // const content = ["content"]; // Example array of messages
+  const [showDropdown, setShowDropdown] = useState(false);
+
   let sender;
 
   let fileInfo = {
@@ -112,7 +114,7 @@ function ChatArea() {
         console.error("Error fetching messages:", error);
       });
   };
-  // console.log(allMessages, "data");
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -158,38 +160,38 @@ function ChatArea() {
     }
   }, [socket, chat_id]);
 
-  // const contents = allMessages.map((message) => message.content);
-  // sender = allMessages.map((message) => message.sender);
-
-
+  const handleSelectionChange = (e) => {
+    setTargetLang(e.target.value);
+    setShowDropdown(true); // Keep the dropdown visible after selection
+  };
 
   const handleTranslateAll = async () => {
     try {
-      const content = allMessages.map(message => message.content);
+      const content = allMessages.map((message) => message.content);
 
-      const delimiter = '|||';
+      const delimiter = "|||";
 
       const combinedContents = content.join(delimiter);
 
-      const translatedCombinedContents = await translate(combinedContents);
-
-      // console.log(translatedCombinedContents);
+      const translatedCombinedContents = await translate(
+        combinedContents,
+        "en",
+        targetLang
+      );
 
       const translatedContents = translatedCombinedContents.split(delimiter);
 
-      const translatedMessages = allMessages.map((message,index) => {
+      const translatedMessages = allMessages.map((message, index) => {
         return {
           ...message,
-          translatedContent : translatedContents[index]
-        }
-      })
+          translatedContent: translatedContents[index],
+        };
+      });
 
-      if(translatedMessages){
-        // console.log("Translated Messages:", translatedMessages)
+      if (translatedMessages) {
         setTranslations(targetLang);
         setTranslatedMessages(translatedMessages);
       }
-
     } catch (error) {
       console.error("Error translating messages:", error);
     }
@@ -231,29 +233,40 @@ function ChatArea() {
     return (
       <div className={"chatArea-container" + (lightTheme ? "" : " dark")}>
         <div className={"chatArea-header" + (lightTheme ? "" : " dark")}>
-          <p className={"con-icon" + (lightTheme ? "" : " dark")}>
-            {chat_user[0]}
-          </p>
-          <div className={"header-text" + (lightTheme ? "" : " dark")}>
-            <p className={"con-title1" + (lightTheme ? "" : " dark")}>
-              {chat_user}
+          <div className="chatName-header">
+            <p className={"con-icon" + (lightTheme ? "" : " dark")}>
+              {chat_user[0]}
             </p>
+            <div className={"header-text" + (lightTheme ? "" : " dark")}>
+              <p className={"con-title1" + (lightTheme ? "" : " dark")}>
+                {chat_user}
+              </p>
+            </div>
           </div>
           <div className="translation-box">
-            <TranslateIcon onClick={handleTranslateAll} />
-            <select
-            className="translation-selection"
-              value={targetLang}
-              onChange={(e) => setTargetLang(e.target.value)}
+            <button
+              className="button"
+              role="button"
+              onClick={handleTranslateAll}
             >
-              <option value="en">English</option>
-              <option value="ta">Tamil</option>
-              <option value="te">Telugu</option>
-              <option value="hi">Hindi</option>
-              <option value="kn">Kannada</option>
-              <option value="ml">Malayalam</option>
-              {/* Add more languages as needed */}
-            </select>
+              <TranslateIcon />
+            </button>
+            <div className="translation-selection">
+              <select
+                className="translation-selection"
+                value={targetLang}
+                onChange={handleSelectionChange}
+              >
+                <option value="disabled">Select Lang</option>
+                <option value="en">English</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="hi">Hindi</option>
+                <option value="kn">Kannada</option>
+                <option value="ml">Malayalam</option>
+                {/* Add more languages as needed */}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -262,12 +275,10 @@ function ChatArea() {
           className={"messages-container" + (lightTheme ? "" : " dark")}
         >
           {translations == "en"
-            ? // Render original messages if translations are available
-              allMessages.map((message, index) => (
+            ? allMessages.map((message, index) => (
                 <MessageSelf props={message} key={index} userData={userData} />
               ))
-            : // Render translated messages if translations are not available
-              translatedMessages.map((message, index) => (
+            : translatedMessages.map((message, index) => (
                 <MessageSelf props={message} key={index} userData={userData} />
               ))}
         </div>
@@ -289,6 +300,13 @@ function ChatArea() {
             }}
           />{" "}
           <div className="send-attach">
+            <VoiceRecorder
+              chat_id={chat_id}
+              userData={userData}
+              socket={socket}
+              setRefresh={setRefresh}
+              refresh={refresh}
+            />
             <input
               onChange={fileSelected}
               ref={fileRef}

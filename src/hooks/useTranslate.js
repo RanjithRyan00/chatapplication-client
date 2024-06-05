@@ -5,7 +5,7 @@ const useTranslate = () => {
   const [translatedText, setTranslatedText] = useState("");
   const [error, setError] = useState(null);
 
-  const translate = async (text, fromLang = "en", toLang = "ta") => {
+  const translate = async (text, fromLang , toLang) => {
     try {
       const options = {
         method: "POST",
@@ -17,8 +17,8 @@ const useTranslate = () => {
           "Content-Type": "application/json",
         },
         data: {
-          from: fromLang,
-          to: toLang,
+          from: fromLang ? fromLang : "en" ,
+          to: toLang ? toLang : "ta",
           q: text,
         },
       };
