@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";
 import TranslateIcon from "@mui/icons-material/Translate";
 import SendIcon from "@mui/icons-material/Send";
-import MessageSelf from "./Messageself";
-import MessageOthers from "./Messageothers";
+import Message from "./Message";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Skeleton from "@mui/material/Skeleton";
@@ -32,7 +30,6 @@ function ChatArea() {
   const [loaded, setLoaded] = useState(false);
   const [socketConnectionStatus, setSocketConnectionStatus] = useState(false);
   const [socket, setSocket] = useState(null);
-  const [chat, setChat] = useState([]);
   const lightTheme = useSelector((state) => state.themeKey);
   const messagesContainerRef = useRef(null);
   const fileRef = useRef();
@@ -276,10 +273,10 @@ function ChatArea() {
         >
           {translations == "en"
             ? allMessages.map((message, index) => (
-                <MessageSelf props={message} key={index} userData={userData} />
+                <Message props={message} key={index} userData={userData} />
               ))
             : translatedMessages.map((message, index) => (
-                <MessageSelf props={message} key={index} userData={userData} />
+                <Message props={message} key={index} userData={userData} />
               ))}
         </div>
 
@@ -300,19 +297,19 @@ function ChatArea() {
             }}
           />{" "}
           <div className="send-attach">
-            <VoiceRecorder
-              chat_id={chat_id}
-              userData={userData}
-              socket={socket}
-              setRefresh={setRefresh}
-              refresh={refresh}
-            />
-            <input
-              onChange={fileSelected}
-              ref={fileRef}
-              type="file"
-              style={{ display: "none" }}
-            />
+              <VoiceRecorder
+                chat_id={chat_id}
+                userData={userData}
+                socket={socket}
+                setRefresh={setRefresh}
+                refresh={refresh}
+              />
+              <input
+                onChange={fileSelected}
+                ref={fileRef}
+                type="file"
+                style={{ display: "none" }}
+              />
             <IconButton onClick={selectFile}>
               <AttachmentIcon />
             </IconButton>

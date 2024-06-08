@@ -1,15 +1,54 @@
 import React, { useEffect, useState } from "react";
 import DownloadIcon from "@mui/icons-material/Download";
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { getUserInfo } from "../shared/getUserInfo";
-import { useDispatch, useSelector } from "react-redux";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+// import bonk from "./bonk.mp3";
+// import sampleAudio from "./sample.wav";
+// import { getUserInfo } from "../shared/getUserInfo";
+import { useSelector } from "react-redux";
+import axios from "axios";
+// import VoiceMessage from "./voiceMessage";
 
 function MessageSelf({ props, userData }) {
   const [userId, setUserId] = useState(userData.data._id);
+  const [audioBlobUrl, setAudioBlobUrl] = useState(null);
+  const [showAudio, setShowAudio] = useState(false);
+
   let content;
   let fileType;
-  // console.log("Props:", props);
-  // console.log('user-data:',userId);
+  const ENDPOINT = "http://localhost:8080";
+
+  useEffect(() => {
+    if (props.voiceNote) {
+      loadAudioFiles();
+    }
+  }, [props.voiceNote]);
+
+  const loadAudioFiles = async () => {
+    if (props.voiceNote) {
+      let audioUrl = props.voiceNote.url;
+      await playAudio(audioUrl);
+    }
+  };
+
+  const playAudio = async (fileUrl) => {
+    try {
+      const response = await axios.get(`${ENDPOINT}/message/audio/${fileUrl}`, {
+        headers: {
+          Authorization: `Bearer ${userData.data.token}`,
+        },
+      });
+
+      if (response) {
+        const audioBase64 = response.data.audio;
+        const audioBlob = base64toBlob(audioBase64, "audio/wav");
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioBlobUrl(audioUrl);
+        setShowAudio(true);
+      }
+    } catch (error) {
+      console.log("Error fetching audio:", error);
+    }
+  };
 
   function base64toBlob(base64Data, contentType = "", sliceSize = 512) {
     const byteCharacters = atob(base64Data);
@@ -110,16 +149,23 @@ function MessageSelf({ props, userData }) {
   }
 
   const lightTheme = useSelector((state) => state.themeKey);
-
-  return props.sender._id === userId ? (
+  // console.log("props:", props)
+  return props.sender?._id === userId ? (
     <div className="self-message-container">
-      <p className="con-icon">{props.sender.name[0]}</p>
+      <p className="con-icon">{props.sender?.name[0]}</p>
       {props.content && (
         <div className="other-text-content ">
-          <p style={{ color: "black" }}>{props.translatedContent ? props.translatedContent : props.content}</p>
+          <p style={{ color: "black" }}>
+            {props.translatedContent ? props.translatedContent : props.content}
+          </p>
         </div>
       )}
       {content && <div style={{ color: "black" }}>{content}</div>}
+      {props.voiceNote && audioBlobUrl && (
+        <audio controls>
+          <source src={audioBlobUrl} type="audio/wav" />
+        </audio>
+      )}
     </div>
   ) : (
     <div className={"other-message-container" + (lightTheme ? "" : " dark")}>
@@ -132,13 +178,23 @@ function MessageSelf({ props, userData }) {
             {props.sender.name}
           </p>
           <div className="other-text-content ">
-            {props.content && <p style={{ color: "black" }}>{props.translatedContent ? props.translatedContent : props.content}</p>}
+            {props.content && (
+              <p style={{ color: "black" }}>
+                {props.translatedContent
+                  ? props.translatedContent
+                  : props.content}
+              </p>
+            )}
             {content && <div style={{ color: "black" }}>{content}</div>}
+            {props.voiceNote && audioBlobUrl && (
+              <audio controls>
+                <source src={audioBlobUrl} type="audio/wav" />
+              </audio>
+            )}
           </div>
         </div>
       </div>
     </div>
-    // <p>hi</p>
   );
 }
 

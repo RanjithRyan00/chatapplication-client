@@ -347,8 +347,16 @@
     height:100%;
 }
 .sound-wave{
-    width:100%;
-    height:100%;
+    /* width:100%;
+    height:100%; */
+    width: 120px;
+    height: fit-content;
+    border-radius: 5px;
+}
+
+.voice-div{
+    display: flex;
+    align-items: center;
 }
 
 .send-attach {
@@ -609,6 +617,41 @@
     display: flex;
     justify-content: start;
 }
+
+/* voice-message styling */
+.voice-message {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  .play-pause-button {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+  
+  .progress-bar {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    flex: 1;
+    height: 10px;
+    margin: 0 10px;
+    position: relative;
+  }
+  
+  .progress {
+    background-color: #4caf50;
+    border-radius: 5px;
+    height: 100%;
+    width: 0;
+  }
+  
+  .timestamp {
+    font-size: 0.8em;
+  }
+  
 
 @media only screen and (max-width:40em) {
     .sb-search {

@@ -1,12 +1,3 @@
-// import React, { useState } from 'react'; // Import useState from react
-// import './Mystyles.css';
-// import ChatArea from './ChatArea';
-// import Leftbar from './Leftbar';
-// import Welcome from './Welcome';
-// import CreateGroups from './CreateGroups';
-// import User_Groups from './User_Groups';
-// import { Outlet } from 'react-router-dom';
-
 import React, { createContext, useState } from "react";
 import './Mystyles.css';
 import Sidebar from "./Leftbar";
@@ -24,11 +15,6 @@ function MainContainer() {
         <Sidebar />
         <Outlet />
       </myContext.Provider>
-      {/* <Welcome /> */}
-      {/* <CreateGroups /> */}
-      {/* <ChatArea props={conversations[0]} /> */}
-      {/* <Users /> */}
-      {/* <Groups /> */}
     </div>
   );
 }

@@ -186,7 +186,7 @@ function Leftbar() {
               }
             });
           }
-          if (!conversation.latestMessage) {
+          if (!conversation.latestMessage ) {
             return (
               <div
                 key={index}
@@ -233,7 +233,7 @@ function Leftbar() {
                 </p>
                 <p className="con-lastMessage">
                   {conversation.latestMessage.content ||
-                    conversation.latestMessage.file.fileName}
+                    conversation.latestMessage.file?.fileName || "Voice Message"}
                 </p>
                 {/* <p className={"con-timeStamp" + (lightTheme ? "" : " dark")}>
                   {formatTimestamp(currentTimestamp)}
