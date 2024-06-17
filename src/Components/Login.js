@@ -83,7 +83,29 @@ function Login() {
       setLoading(false);
     }
   };
+  function splitTextIntoSpans(target) {
+    let elements = document.querySelectorAll(target);
+    elements.forEach((element) => {
+      element.classList.add("split-text");
+      let text = element.innerText;
+      let splitText = text
+        .split(" ")
+        .map(function (word) {
+          let char = word
+            .split("")
+            .map((char) => {
+              return `<span class="split-char">${char}</span>`;
+            })
+            .join("");
+          return `<div class="split-word">${char}</div>`;
+        })
+        .join("");
 
+      element.innerHTML = splitText;
+    });
+  }
+
+  splitTextIntoSpans(".bubble-text");
   return (
     <>
       <Backdrop
@@ -93,11 +115,15 @@ function Login() {
         <CircularProgress color="secondary" />
       </Backdrop>
       <div className="login-container">
-        <div className="image-container">
-          <img src={logo} alt="Logo" className="welcome-logo" />
-        </div>
+      <div className="text-align">
+          <p className="bubble-text text">MEXT</p>
+          <div className="image-container">
+            <img src={logo} alt="Logo" className="welcome-logo" />
+          </div>
+          </div>
         {showlogin && (
           <div className="login-box">
+          <div className="login-content">
             <p className="login-text">Login to your Account</p>
             <TextField
               onChange={changeHandler}
@@ -148,10 +174,12 @@ function Login() {
             {logInStatus ? (
               <Toaster key={logInStatus.key} message={logInStatus.msg} />
             ) : null}
+            </div>
           </div>
         )}
         {!showlogin && (
           <div className="login-box">
+          <div className="login-content">
             <p className="login-text">Create your Account</p>
             <TextField
               onChange={changeHandler}
@@ -215,6 +243,7 @@ function Login() {
             {signInStatus ? (
               <Toaster key={signInStatus.key} message={signInStatus.msg} />
             ) : null}
+          </div>
           </div>
         )}
       </div>

@@ -59,7 +59,7 @@ const VoiceRecorder = ({ chat_id, userData, socket, setRefresh, refresh }) => {
         record={isRecording}
         className="sound-wave"
         strokeColor="#000000"
-        backgroundColor="#FF4082"
+        backgroundColor="#FCF6f5ff"
       />
 
 
