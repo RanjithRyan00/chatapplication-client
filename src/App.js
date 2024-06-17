@@ -18,34 +18,7 @@ const UserContext = createContext()
 function App() {
 
 
-  // const axios = require('axios');
 
-  // const options = {
-  //   method: 'POST',
-  //   url: 'https://rapid-translate-multi-traduction.p.rapidapi.com/t',
-  //   headers: {
-  //     'x-rapidapi-key': '6119bad592msh840927163e31241p1f90d7jsn877086212290',
-  //     'x-rapidapi-host': 'rapid-translate-multi-traduction.p.rapidapi.com',
-  //     'Content-Type': 'application/json'
-  //   },
-  //   data: {
-  //     from: 'en',
-  //     to: 'ar',
-  //     q: 'Hello ! Rapid Translate Multi Traduction'
-  //   }
-  // };
-  
-  // async function translate() {
-  //   try {
-  //     const response = await axios.request(options);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-  
-  // translate();
-    
 
   
   const dispatch = useDispatch();

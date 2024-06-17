@@ -5,20 +5,19 @@ const useTranslate = () => {
   const [translatedText, setTranslatedText] = useState("");
   const [error, setError] = useState(null);
 
-  const translate = async (text, fromLang = "en", toLang = "ta") => {
+  const translate = async (text, fromLang , toLang) => {
     try {
       const options = {
         method: "POST",
         url: "https://rapid-translate-multi-traduction.p.rapidapi.com/t",
         headers: {
-          "x-rapidapi-key":
-            "6119bad592msh840927163e31241p1f90d7jsn877086212290",
-          "x-rapidapi-host": "rapid-translate-multi-traduction.p.rapidapi.com",
-          "Content-Type": "application/json",
-        },
+		'x-rapidapi-key': '062b7d0c16msha8af22b9fb2e623p14283cjsne7e10dea050c',
+		'x-rapidapi-host': 'rapid-translate-multi-traduction.p.rapidapi.com',
+		'Content-Type': 'application/json'
+	},
         data: {
-          from: fromLang,
-          to: toLang,
+          from: fromLang ? fromLang : "en" ,
+          to: toLang ? toLang : "ta",
           q: text,
         },
       };
