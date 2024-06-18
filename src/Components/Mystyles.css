@@ -347,8 +347,6 @@
     height:100%;
 }
 .sound-wave{
-    /* width:100%;
-    height:100%; */
     width: 120px;
     height: fit-content;
     border-radius: 5px;
@@ -357,6 +355,86 @@
 .voice-div{
     display: flex;
     align-items: center;
+}
+
+.voice-message {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px 15px;
+    margin: 10px;
+    height: 40px;
+    width: 275px;
+    display: flex;
+    align-items: center;
+}
+
+.play-pause-icon {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.voice-message input[type="range"] {
+    -webkit-appearance: none; /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 2px; /* Height of the line */
+    background: #007bff; /* Background color of the line */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Semi-transparent */
+    transition: opacity .15s ease-in-out;
+}
+
+.voice-message input[type="range"]:hover {
+    opacity: 1; /* Fully opaque on hover */
+  }
+
+  .voice-message input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 12px; /* Width of the handle */
+    height: 12px; /* Height of the handle */
+    background: #007bff; /* Color of the handle */
+    cursor: pointer; /* Cursor on hover */
+    border-radius: 50%; /* Rounded handle */
+  }
+  
+  .voice-message input[type="range"]::-moz-range-thumb {
+    width: 12px; /* Width of the handle */
+    height: 12px; /* Height of the handle */
+    background: #007bff; /* Color of the handle */
+    cursor: pointer; /* Cursor on hover */
+    border-radius: 50%; /* Rounded handle */
+    border: none; /* Remove border */
+  }
+
+.voice-message .time {
+    font-size: 13px;
+    width: 70px;
+    text-align: center;
+    margin-left: 5px;
+    font-weight: 500;
+}
+
+.voice-message .speed {
+    padding: 9px;
+    font-weight: 300;
+    font-family: sans-serif;
+    cursor: pointer;
+    color: white;
+    background: #007bff;
+    /* opacity: 2px; */
+    border-radius: 50%;
 }
 
 .send-attach {
@@ -617,13 +695,6 @@
     display: flex;
     justify-content: start;
 }
-
-/* voice-message styling */
-.voice-message {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-  }
   
   .play-pause-button {
     background: none;

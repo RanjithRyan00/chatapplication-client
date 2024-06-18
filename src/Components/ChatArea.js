@@ -13,6 +13,7 @@ import io from "socket.io-client";
 import { UserContext } from "../App";
 import useTranslate from "../hooks/useTranslate"; // Importing the translation hook
 import VoiceRecorder from "./VoiceRecorder";
+import Mic from "./Mic";
 
 const ENDPOINT = "http://localhost:8080";
 
@@ -140,6 +141,7 @@ function ChatArea() {
 
       socket.on("uploaded", (data) => {
         // Handle uploaded file
+        getChatMessages();
       });
     }
 
@@ -297,19 +299,26 @@ function ChatArea() {
             }}
           />{" "}
           <div className="send-attach">
-              <VoiceRecorder
+            {/* <VoiceRecorder
                 chat_id={chat_id}
                 userData={userData}
                 socket={socket}
                 setRefresh={setRefresh}
                 refresh={refresh}
-              />
-              <input
-                onChange={fileSelected}
-                ref={fileRef}
-                type="file"
-                style={{ display: "none" }}
-              />
+              /> */}
+            <Mic
+              chat_id={chat_id}
+              userData={userData}
+              socket={socket}
+              setRefresh={setRefresh}
+              refresh={refresh}
+            />
+            <input
+              onChange={fileSelected}
+              ref={fileRef}
+              type="file"
+              style={{ display: "none" }}
+            />
             <IconButton onClick={selectFile}>
               <AttachmentIcon />
             </IconButton>

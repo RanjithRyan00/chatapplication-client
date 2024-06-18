@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import DownloadIcon from "@mui/icons-material/Download";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-// import bonk from "./bonk.mp3";
-// import sampleAudio from "./sample.wav";
-// import { getUserInfo } from "../shared/getUserInfo";
 import { useSelector } from "react-redux";
 import axios from "axios";
-// import VoiceMessage from "./voiceMessage";
+import VoiceDisplay from "./VoiceDisplay";
 
 function MessageSelf({ props, userData }) {
   const [userId, setUserId] = useState(userData.data._id);
@@ -16,39 +13,6 @@ function MessageSelf({ props, userData }) {
   let content;
   let fileType;
   const ENDPOINT = "http://localhost:8080";
-
-  useEffect(() => {
-    if (props.voiceNote) {
-      loadAudioFiles();
-    }
-  }, [props.voiceNote]);
-
-  const loadAudioFiles = async () => {
-    if (props.voiceNote) {
-      let audioUrl = props.voiceNote.url;
-      await playAudio(audioUrl);
-    }
-  };
-
-  const playAudio = async (fileUrl) => {
-    try {
-      const response = await axios.get(`${ENDPOINT}/message/audio/${fileUrl}`, {
-        headers: {
-          Authorization: `Bearer ${userData.data.token}`,
-        },
-      });
-
-      if (response) {
-        const audioBase64 = response.data.audio;
-        const audioBlob = base64toBlob(audioBase64, "audio/wav");
-        const audioUrl = URL.createObjectURL(audioBlob);
-        setAudioBlobUrl(audioUrl);
-        setShowAudio(true);
-      }
-    } catch (error) {
-      console.log("Error fetching audio:", error);
-    }
-  };
 
   function base64toBlob(base64Data, contentType = "", sliceSize = 512) {
     const byteCharacters = atob(base64Data);
@@ -161,10 +125,9 @@ function MessageSelf({ props, userData }) {
         </div>
       )}
       {content && <div style={{ color: "black" }}>{content}</div>}
-      {props.voiceNote && audioBlobUrl && (
-        <audio controls>
-          <source src={audioBlobUrl} type="audio/wav" />
-        </audio>
+      {props.voiceNote && (
+        <VoiceDisplay audioUrl={props.voiceNote.url} />
+        // <VoiceMessage voiceUrl = {props.voiceNote.url} voiceDuration = {props.voiceNote.duration}/>
       )}
     </div>
   ) : (
@@ -186,10 +149,11 @@ function MessageSelf({ props, userData }) {
               </p>
             )}
             {content && <div style={{ color: "black" }}>{content}</div>}
-            {props.voiceNote && audioBlobUrl && (
-              <audio controls>
-                <source src={audioBlobUrl} type="audio/wav" />
-              </audio>
+            {props.voiceNote && (
+              // <audio controls>
+              //   <source src={audioBlobUrl} type="audio/wav" />
+              // </audio>
+              <VoiceDisplay src = { props.voice.url}/>
             )}
           </div>
         </div>

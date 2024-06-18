@@ -34,10 +34,7 @@ function Login() {
        data,
         config
       );
-      // setLogInStatus({ msg: "Success", key: Math.random() });
-      // setLoading(false);
-      // localStorage.setItem("userData", JSON.stringify(response));
-      // navigate("/app/welcome");
+
       if (response) {
         setLogInStatus({ msg: "Success", key: Math.random() });
         setLoading(false);
@@ -52,6 +49,14 @@ function Login() {
 
   const signUpHandler = async () => {
     setLoading(true);
+
+    // const { name, email, password } = data;
+
+    // if (!name || !email || !password) {
+    //   console.log('Please fill in all fields.');
+    //   return;
+    // }
+
     try {
       const config = {
         headers: {
@@ -68,6 +73,7 @@ function Login() {
       localStorage.setItem("userData", JSON.stringify(response));
       setLoading(false);
     } catch (error) {
+
       if (error.response.status === 405) {
         setLogInStatus({
           msg: "User with this email ID already Exists",
@@ -80,6 +86,10 @@ function Login() {
           key: Math.random(),
         });
       }
+      setLogInStatus({
+        msg: "Error Occured during regiser",
+        key: Math.random(),
+      })
       setLoading(false);
     }
   };
